@@ -16,64 +16,20 @@ public class ChatController {
 
     public ChatController(ChatClient.Builder builder, ToolCallbackProvider tools) {
 
-        Arrays.stream(tools.getToolCallbacks()).forEach(t -> {
-            log.info("Tool Callback found: {}", t.getToolDefinition());
-        });
+        Arrays.stream(tools.getToolCallbacks()).forEach(t ->
+                log.info("Tool Callback found: {}", t.getToolDefinition())
+        );
 
         this.chatClient = builder
-                .defaultToolCallbacks(tools)
+                .defaultToolCallbacks(tools)   
                 .build();
     }
 
     @GetMapping("/chat")
-    public String chat() {
+    public String chat(@RequestParam String message) {
         return chatClient.prompt()
-                .user("find the meeting email from manager")
-                .call()
-                .content();
-    }
-
-    @GetMapping("/folders")
-    public String listFolders() {
-        return chatClient.prompt()
-                .user("Call outlook_list_folders tool.")
-                .call()
-                .content();
-    }
-
-    @GetMapping("/summary")
-    public String summary() {
-        return chatClient.prompt()
-                .user("Call outlook_mailbox_summary tool.")
-                .call()
-                .content();
-    }
-
-    @GetMapping("/emails/{id}")
-    public String getEmail(@PathVariable String id) {
-        return chatClient.prompt()
-                .user("Fetch email details for id: " + id + " using outlook_get_email.")
-                .call()
-                .content();
-    }
-
-    @GetMapping("/emails/search")
-    public String searchEmails(
-            @RequestParam(required = false) String query,
-            @RequestParam(required = false) String folder,
-            @RequestParam(required = false) Boolean unread,
-            @RequestParam(required = false) Integer max
-    ) {
-        String prompt = "Search emails using these filters:\n" +
-                "- query: " + query + "\n" +
-                "- folder: " + folder + "\n" +
-                "- unread: " + unread + "\n" +
-                "- max: " + max + "\n" +
-                "Use outlook_search_emails tool.";
-
-        return chatClient.prompt()
-                .user(prompt)
-                .call()
+                .user(message)
+                .call()        
                 .content();
     }
 }
